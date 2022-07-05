@@ -44,6 +44,7 @@ const main = async () => {
         let appointmentDay = undefined;
         let isAppointmentAvailable = false;
         do {
+            currentCalendarTitle = await getCalendarTitle(page);
             const count = await appointmentDays.count();
             for (let i = 0; i < count; i++) {
                 appointmentDay = appointmentDays.nth(i);
@@ -59,7 +60,6 @@ const main = async () => {
                 }
             }
             await nextButton.click();
-            currentCalendarTitle = await getCalendarTitle(page);
         }
         while (currentCalendarTitle.getMonth() != currentAppointmentDate.getMonth() || currentCalendarTitle.getFullYear() != currentAppointmentDate.getFullYear());
         if (isAppointmentAvailable) {
