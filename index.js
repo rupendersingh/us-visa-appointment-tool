@@ -40,20 +40,33 @@ const main = async () => {
         }
 
         const calendars = page.locator('table.ui-datepicker-calendar >> nth=0');
-        const appointmentDay = calendars.locator("[data-event=click] >> nth=0")
-        while (currentCalendarTitle.getMonth() != currentAppointmentDate.getMonth() || currentCalendarTitle.getFullYear() != currentAppointmentDate.getFullYear()) {
-            const count = await appointmentDay.count();
-            if (count > 0) break;
+        const appointmentDays = calendars.locator("[data-event=click]")
+        let appointmentDay = undefined;
+        let isAppointmentAvailable = false;
+        do {
+            const count = await appointmentDays.count();
+            for (let i = 0; i < count; i++) {
+                appointmentDay = appointmentDays.nth(i);
+                const newAppointmentMonth = await appointmentDay.getAttribute('data-month');
+                const newAppointmentYear = await appointmentDay.getAttribute('data-year');
+                const newAppointmentDay = await appointmentDay.locator('a').innerHTML();
+                const newAppointmentDate = new Date(newAppointmentYear, newAppointmentMonth, newAppointmentDay);
+                if (newAppointmentDate >= lowerLimitDate) {
+                    console.log("New appointment date available: ", newAppointmentDate);
+                    console.log(newAppointmentDate);
+                    isAppointmentAvailable = true;
+                    break;
+                }
+            }
             await nextButton.click();
             currentCalendarTitle = await getCalendarTitle(page);
         }
-        if (await appointmentDay.count() > 0) {
+        while (currentCalendarTitle.getMonth() != currentAppointmentDate.getMonth() || currentCalendarTitle.getFullYear() != currentAppointmentDate.getFullYear());
+        if (isAppointmentAvailable) {
             const newAppointmentMonth = await appointmentDay.getAttribute('data-month');
             const newAppointmentYear = await appointmentDay.getAttribute('data-year');
             const newAppointmentDay = await appointmentDay.locator('a').innerHTML();
             const newAppointmentDate = new Date(newAppointmentYear, newAppointmentMonth, newAppointmentDay);
-            console.log("New appointment date available: ", newAppointmentDate);
-            console.log(newAppointmentDate);
             if (newAppointmentDate < currentAppointmentDate) {
                 await appointmentDay.click();
                 const appointmentTimeDropdown = page.locator('#appointments_consulate_appointment_time');
