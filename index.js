@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { credentials } from "./credentials";
 
 const main = async () => {
     try {
@@ -9,8 +10,8 @@ const main = async () => {
         const userPasswordInput = page.locator('#user_password');
         const policyCheckbox = page.locator('#policy_confirmed');
         const loginButton = page.locator('[name=commit]');
-        await userEmailInput.fill('shashwat.jolly@gmail.com');
-        await userPasswordInput.fill('toolPassword@gondus');
+        await userEmailInput.fill(credentials.userEmail);
+        await userPasswordInput.fill(credentials.password);
         await policyCheckbox.check({ force: true });
         await loginButton.click();
 
@@ -27,6 +28,13 @@ const main = async () => {
 
         const appointmentLocationDropdown = page.locator('#appointments_consulate_appointment_facility_id');
         await appointmentLocationDropdown.selectOption({ label: "Vancouver" });
+
+        const errorText = page.locator('#consulate_date_time_not_available');
+        const isError = await errorText.isVisible();
+        if (isError) {
+            await browser.close();
+            return;
+        }
         const appointmentDateOption = page.locator('#appointments_consulate_appointment_date');
         await appointmentDateOption.click();
         const nextButton = page.locator('a.ui-datepicker-next');
@@ -59,6 +67,7 @@ const main = async () => {
                     break;
                 }
             }
+            if (isAppointmentAvailable) break;
             await nextButton.click();
         }
         while (currentCalendarTitle.getMonth() != currentAppointmentDate.getMonth() || currentCalendarTitle.getFullYear() != currentAppointmentDate.getFullYear());
