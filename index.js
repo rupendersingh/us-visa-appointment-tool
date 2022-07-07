@@ -1,9 +1,9 @@
 import { chromium } from "playwright";
-import { credentials } from "./credentials";
+import { credentials } from "./credentials.js";
 
 const main = async () => {
     try {
-        const browser = await chromium.launch({ headless: false, slowMo: 200, channel: 'msedge' });
+        const browser = await chromium.launch({ headless: false, slowMo: 600, channel: 'msedge' });
         const page = await browser.newPage();
         await page.goto('https://ais.usvisa-info.com/en-ca/niv/users/sign_in');
         const userEmailInput = page.locator('#user_email');
@@ -32,6 +32,7 @@ const main = async () => {
         const errorText = page.locator('#consulate_date_time_not_available');
         const isError = await errorText.isVisible();
         if (isError) {
+            console.log("No appointments error");
             await browser.close();
             return;
         }
@@ -102,4 +103,4 @@ const getCalendarTitle = async (page) => {
 }
 
 main();
-setInterval(() => { main() }, 3 * 60 * 1000);
+setInterval(() => { main() }, 16 * 60 * 1000);
