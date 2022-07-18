@@ -1,17 +1,17 @@
 import { chromium } from "playwright";
-import { credentials } from "./credentials.js";
+import { config } from "./config.js";
 
 const main = async () => {
     try {
-        const browser = await chromium.launch({ headless: false, slowMo: 600, channel: 'msedge' });
+        const browser = await chromium.launch({ headless: true, slowMo: 600, channel: 'msedge' });
         const page = await browser.newPage();
         await page.goto('https://ais.usvisa-info.com/en-ca/niv/users/sign_in');
         const userEmailInput = page.locator('#user_email');
         const userPasswordInput = page.locator('#user_password');
         const policyCheckbox = page.locator('#policy_confirmed');
         const loginButton = page.locator('[name=commit]');
-        await userEmailInput.fill(credentials.userEmail);
-        await userPasswordInput.fill(credentials.password);
+        await userEmailInput.fill(config.userEmail);
+        await userPasswordInput.fill(config.password);
         await policyCheckbox.check({ force: true });
         await loginButton.click();
 
@@ -40,7 +40,7 @@ const main = async () => {
         await appointmentDateOption.click();
         const nextButton = page.locator('a.ui-datepicker-next');
 
-        const _lowerLimitDate = "26 July, 2022";
+        const _lowerLimitDate = config.lowerLimitDate;
         const lowerLimitDate = new Date(_lowerLimitDate);
         let currentCalendarTitle = await getCalendarTitle(page);
         while (currentCalendarTitle.getMonth() != lowerLimitDate.getMonth() || currentCalendarTitle.getFullYear() != lowerLimitDate.getFullYear()) {
