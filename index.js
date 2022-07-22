@@ -42,6 +42,8 @@ const main = async () => {
 
         const _lowerLimitDate = config.lowerLimitDate;
         const lowerLimitDate = new Date(_lowerLimitDate);
+        console.log("The tool will search for appointments on/after: ", lowerLimitDate);
+
         let currentCalendarTitle = await getCalendarTitle(page);
         while (currentCalendarTitle.getMonth() != lowerLimitDate.getMonth() || currentCalendarTitle.getFullYear() != lowerLimitDate.getFullYear()) {
             await nextButton.click();
@@ -103,4 +105,4 @@ const getCalendarTitle = async (page) => {
 }
 
 main();
-setInterval(() => { main() }, 16 * 60 * 1000);
+setInterval(() => { main() }, config.intervalInMins * 60 * 1000);
