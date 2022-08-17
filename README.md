@@ -1,10 +1,10 @@
 ## US Visa Appointment Tool
 
-This tool automated the task of booking US visa appointments from Canada on this website: [https://ais.usvisa-info.com/en-ca/niv]().
+This tool automates the task of booking US visa appointments from Canada on this website: [https://ais.usvisa-info.com/en-ca/niv]().
 
 ### Running this tool
 
-*Note: You need to have an account on the website and should have booked an appointment before running the tool.*
+*Note: You need to have an account on the website before running the tool.*
 
 1. Install [Node.js](https://nodejs.org/en/).
 2. Clone and cd into the repo.
