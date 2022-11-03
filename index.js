@@ -45,8 +45,9 @@ const main = async () => {
         const nextButton = page.locator('a.ui-datepicker-next');
 
         const _lowerLimitDate = config.lowerLimitDate;
-        const lowerLimitDate = new Date(_lowerLimitDate);
+        let lowerLimitDate = new Date(_lowerLimitDate);
         console.log("The tool will search for appointments on/after: ", lowerLimitDate);
+        lowerLimitDate = currentAppointmentDate ? max(currentAppointmentDate, lowerLimitDate) : lowerLimitDate;
 
         let currentCalendarTitle = await getCalendarTitle(page);
         while (currentCalendarTitle.getMonth() != lowerLimitDate.getMonth() || currentCalendarTitle.getFullYear() != lowerLimitDate.getFullYear()) {
