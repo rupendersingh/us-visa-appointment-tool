@@ -48,7 +48,7 @@ const main = async () => {
         let lowerLimitDate = new Date(_lowerLimitDate);
         console.log("The tool will search for appointments on/after: ", lowerLimitDate);
         const currentDate = new Date();
-        lowerLimitDate = max(lowerLimitDate, currentDate);
+        lowerLimitDate = Math.max(lowerLimitDate, currentDate);
 
         let currentCalendarTitle = await getCalendarTitle(page);
         while (currentCalendarTitle.getMonth() != lowerLimitDate.getMonth() || currentCalendarTitle.getFullYear() != lowerLimitDate.getFullYear()) {
