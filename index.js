@@ -3,7 +3,7 @@ import { config } from "./config.js";
 
 const main = async () => {
     try {
-        const browser = await chromium.launch({ headless: true, slowMo: 600, channel: 'msedge' });
+        const browser = await chromium.launch({ headless: false, slowMo: 600, channel: 'msedge' });
         const page = await browser.newPage();
         await page.goto('https://ais.usvisa-info.com/en-ca/niv/users/sign_in');
         const userEmailInput = page.locator('#user_email');
@@ -17,13 +17,15 @@ const main = async () => {
 
         let currentAppointmentDate = null; // This will be null if no appointment is booked previously
         const currentAppointmentDiv = page.locator('p.consular-appt').nth(0);
-        if(await currentAppointmentDiv.count() > 0) {
+        //setTimeout(() => {  console.log("Checking current appointmen date"); }, 3000);
+        //console.log("Checking current appointmen date");
+        //if(await currentAppointmentDiv.count() > 0) {
             const currentAppointmentDivContent = await currentAppointmentDiv.innerHTML();
             const currentAppointmentText = currentAppointmentDivContent.split('</strong>')[1];
             const _currentAppointmentDate = currentAppointmentText.split(',')[0] + ' ' + currentAppointmentText.split(',')[1];
             currentAppointmentDate = new Date(_currentAppointmentDate);
             console.log("Current appointment date found: ", currentAppointmentDate);
-        }
+        //}
 
         const continueButton = page.locator("'Continue'").nth(0);
         const continueUrl = await continueButton.getAttribute('href');
@@ -46,9 +48,15 @@ const main = async () => {
 
         const _lowerLimitDate = config.lowerLimitDate;
         let lowerLimitDate = new Date(_lowerLimitDate);
-        console.log("The tool will search for appointments on/after: ", lowerLimitDate);
+        console.log("The tool will search for appointments after: ", lowerLimitDate);
         const currentDate = new Date();
-        lowerLimitDate = Math.max(lowerLimitDate, currentDate);
+        //lowerLimitDate = Math.max(lowerLimitDate, currentDate);
+        lowerLimitDate = new Date(Math.max(lowerLimitDate, currentDate));
+
+        const _upperLimitDate = config.upperLimitDate;
+        let upperLimitDate = new Date(_upperLimitDate);
+        console.log("The tool will search for appointments before: ", upperLimitDate);
+        //const currentDate = new Date();
 
         let currentCalendarTitle = await getCalendarTitle(page);
         while (currentCalendarTitle.getMonth() != lowerLimitDate.getMonth() || currentCalendarTitle.getFullYear() != lowerLimitDate.getFullYear()) {
@@ -79,6 +87,7 @@ const main = async () => {
                 }
             }
             if (isAppointmentAvailable) break;
+            if (currentCalendarTitle.getMonth() == upperLimitDate.getMonth() && currentCalendarTitle.getFullYear() == upperLimitDate.getFullYear()) break;
             await nextButton.click();
             nextClicks++;
             // Handle case for first appointment and reschedule cases conditional on whether currentAppointmentDate is set
