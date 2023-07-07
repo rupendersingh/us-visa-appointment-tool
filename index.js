@@ -5,7 +5,7 @@ import { TIMEOUT } from "dns";
 var counter = 0;
 const main = async () => {
     try {
-        const browser = await chromium.launch({ headless: false, slowMo: 600, channel: 'chrome' });
+        const browser = await chromium.launch({ headless: true, slowMo: 600, channel: 'chrome' });
         counter = counter +1;
         const page = await browser.newPage();
         await page.goto('https://ais.usvisa-info.com/en-ca/niv/users/sign_in');
@@ -36,7 +36,7 @@ const main = async () => {
         const urlBase = 'https://ais.usvisa-info.com' + continueUrl.replace("continue_actions", "")
         await page.goto(urlBase + 'appointment');
 
-        for(var i=1; i<=10;i++){
+        //for(var i=1; i<=10;i++){
             const appointmentLocationDropdown = page.locator('#appointments_consulate_appointment_facility_id');
             await appointmentLocationDropdown.selectOption({ label: config.location });
 
@@ -45,6 +45,9 @@ const main = async () => {
             if (isError) {
                 console.log("No appointments error");
                 await browser.close();
+                console.log("Cooling down for 1 hr");
+                counter = 0;
+                await sleep(1*3600*1000);
                 //await page.reload();
                 if (counter%5 == 0){
                     console.log("Counter value = "+counter);
@@ -141,9 +144,9 @@ const main = async () => {
                 });
                 
             }
-            await page.reload({timeout:0});
-            console.log("i = "+i);
-        } 
+            //await page.reload({timeout:0});
+            //console.log("i = "+i);
+        //} 
     await browser.close();
     } catch (err) {
         console.log("Error: ", err);
@@ -155,6 +158,10 @@ const getCalendarTitle = async (page) => {
     const year = await page.locator('span.ui-datepicker-year >> nth=0').innerHTML();
     return new Date(month + ' ' + year);
 }
+
+async function sleep(timeout) {
+    return await new Promise(resolve => setTimeout(resolve, timeout));
+  }
 
 main();
 setInterval(() => { main() }, config.intervalInMins * 60 * 1000);
